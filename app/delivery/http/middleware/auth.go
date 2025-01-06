@@ -55,13 +55,6 @@ func (m *authMiddleware) AuthUser() gin.HandlerFunc {
 		token, err := jwt.ParseWithClaims(tokenString, &model.JWTClaimUser{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(m.secretKeyUser), nil
 		})
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, helpers.Response{
-				Status:  http.StatusUnauthorized,
-				Message: err.Error(),
-			})
-			return
-		}
 
 		// check validity token
 		if !token.Valid {
@@ -80,6 +73,13 @@ func (m *authMiddleware) AuthUser() gin.HandlerFunc {
 				})
 				return
 			}
+		}
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, helpers.Response{
+				Status:  http.StatusUnauthorized,
+				Message: err.Error(),
+			})
+			return
 		}
 
 		claims, ok := token.Claims.(*model.JWTClaimUser)

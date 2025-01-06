@@ -14,6 +14,10 @@ type Todo struct {
 	User User `gorm:"foreignKey:user_id;references:id" json:"-"`
 }
 
+func (m *Todo) TableName() string {
+	return "todos"
+}
+
 type TodoStatus string
 
 const (

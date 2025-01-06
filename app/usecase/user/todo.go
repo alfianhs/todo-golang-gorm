@@ -137,12 +137,10 @@ func (u *todoUsecase) Create(ctx context.Context, claim model.JWTClaimUser, payl
 
 	// create todo
 	newTodo := model.Todo{
-		ID:        uuid.New().String(),
-		Name:      payload.Name,
-		UserId:    claim.UserID,
-		Status:    model.TodoStatusNotStarted,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		ID:     uuid.New().String(),
+		Name:   payload.Name,
+		UserId: claim.UserID,
+		Status: model.TodoStatusNotStarted,
 	}
 
 	// save todo
@@ -195,7 +193,6 @@ func (u *todoUsecase) Update(ctx context.Context, claim model.JWTClaimUser, todo
 	// update todo
 	todo.Name = payload.Name
 	todo.Status = payload.Status
-	todo.UpdatedAt = time.Now()
 
 	// save todo
 	err = u.todoRepository.Update(ctx, todo)

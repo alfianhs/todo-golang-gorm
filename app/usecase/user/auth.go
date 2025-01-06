@@ -78,12 +78,10 @@ func (u *authUsecase) Register(ctx context.Context, payload request.RegisterRequ
 
 	// create user
 	user = &model.User{
-		ID:        uuid.New().String(),
-		Name:      payload.Name,
-		Email:     payload.Email,
-		Password:  string(hashedPassword),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		ID:       uuid.New().String(),
+		Name:     payload.Name,
+		Email:    payload.Email,
+		Password: string(hashedPassword),
 	}
 	err = u.userRepository.Create(ctx, user)
 	if err != nil {

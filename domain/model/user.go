@@ -16,7 +16,7 @@ type User struct {
 	Todos []Todo `gorm:"foreignKey:user_id;references:id" json:"todo,omitempty"`
 }
 
-func (u *User) TableName() string {
+func (m *User) TableName() string {
 	return "users"
 }
 
