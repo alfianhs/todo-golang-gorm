@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS todos (
     "status" todo_status NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "deleted_at" timestamp,
+    FOREIGN KEY ("user_id") REFERENCES users("id")
 );
 
 CREATE INDEX idx_todos_deleted_at ON todos (deleted_at); -- +create index

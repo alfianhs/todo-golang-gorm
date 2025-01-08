@@ -6,6 +6,7 @@ import (
 
 type User struct {
 	ID        string     `gorm:"column:id;type:uuid;primary_key" json:"id"`
+	FileID    string     `gorm:"column:file_id;type:uuid;not null" json:"file_id"`
 	Name      string     `gorm:"column:name;type:varchar(255);not null" json:"name"`
 	Email     string     `gorm:"column:email;type:varchar(255);not null;unique" json:"email"`
 	Password  string     `gorm:"column:password;type:varchar(255);not null" json:"-"`
@@ -13,7 +14,8 @@ type User struct {
 	UpdatedAt time.Time  `gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli" json:"updated_at"`
 	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"-"`
 
-	Todos []Todo `gorm:"foreignKey:user_id;references:id" json:"todo,omitempty"`
+	Todos  []Todo `gorm:"foreignKey:user_id;references:id" json:"todo,omitempty"`
+	Avatar File   `gorm:"foreignKey:file_id;references:id" json:"avatar,omitempty"`
 }
 
 func (m *User) TableName() string {
@@ -24,4 +26,5 @@ type UserRelation string
 
 const (
 	UserRelationTodo UserRelation = "Todo"
+	UserRelationFile UserRelation = "Avatar"
 )
