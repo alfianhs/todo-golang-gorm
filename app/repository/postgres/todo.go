@@ -30,6 +30,7 @@ type TodoRepository interface {
 func (r *todoRepository) queryFilter(query *gorm.DB, filters map[string]interface{}) *gorm.DB {
 	query = helpers.CommonFilter(query, filters)
 
+	// filters
 	if userID, ok := filters["user_id"].(string); ok {
 		query = query.Where("user_id = ?", userID)
 	}

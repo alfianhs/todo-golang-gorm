@@ -26,6 +26,7 @@ type UserRepository interface {
 func (r *userRepository) queryFilter(query *gorm.DB, filters map[string]interface{}) *gorm.DB {
 	query = helpers.CommonFilter(query, filters)
 
+	// filters
 	if email, ok := filters["email"].(string); ok {
 		query = query.Where("email = ?", email)
 	}
