@@ -23,8 +23,8 @@ type TodoRepository interface {
 	FindOne(ctx context.Context, filters map[string]interface{}) (*model.Todo, error)
 	Count(ctx context.Context, filters map[string]interface{}) (int64, error)
 	Create(ctx context.Context, todo *model.Todo) error
-	Update(ctx context.Context, todo *model.Todo) error
-	Delete(ctx context.Context, todo *model.Todo) error
+	UpdateOne(ctx context.Context, todo *model.Todo) error
+	DeleteOne(ctx context.Context, todo *model.Todo) error
 }
 
 func (r *todoRepository) queryFilter(query *gorm.DB, filters map[string]interface{}) *gorm.DB {
@@ -85,14 +85,14 @@ func (r *todoRepository) Create(ctx context.Context, todo *model.Todo) error {
 	return r.db.WithContext(ctx).Create(todo).Error
 }
 
-func (r *todoRepository) Update(ctx context.Context, todo *model.Todo) error {
+func (r *todoRepository) UpdateOne(ctx context.Context, todo *model.Todo) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
 	return r.db.WithContext(ctx).Save(todo).Error
 }
 
-func (r *todoRepository) Delete(ctx context.Context, todo *model.Todo) error {
+func (r *todoRepository) DeleteOne(ctx context.Context, todo *model.Todo) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}

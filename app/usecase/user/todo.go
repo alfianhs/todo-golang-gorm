@@ -13,7 +13,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
 
 type todoUsecase struct {
@@ -34,8 +33,8 @@ type TodoUsecase interface {
 	GetAll(ctx context.Context, claim model.JWTClaimUser, query url.Values) helpers.PaginatedResponse
 	GetOne(ctx context.Context, claim model.JWTClaimUser, todoID string) helpers.Response
 	Create(ctx context.Context, claim model.JWTClaimUser, payload request.CreateTodoRequest) helpers.Response
-	Update(ctx context.Context, claim model.JWTClaimUser, todoID string, payload request.UpdateTodoRequest) helpers.Response
-	Delete(ctx context.Context, claim model.JWTClaimUser, todoID string) helpers.Response
+	UpdateOne(ctx context.Context, claim model.JWTClaimUser, todoID string, payload request.UpdateTodoRequest) helpers.Response
+	DeleteOne(ctx context.Context, claim model.JWTClaimUser, todoID string) helpers.Response
 }
 
 func (u *todoUsecase) GetAll(ctx context.Context, claim model.JWTClaimUser, query url.Values) helpers.PaginatedResponse {
@@ -127,8 +126,6 @@ func (u *todoUsecase) Create(ctx context.Context, claim model.JWTClaimUser, payl
 	ctx, cancel := context.WithTimeout(ctx, u.contextTimeout)
 	defer cancel()
 
-	logrus.Infof("payload: %v", payload.Name)
-
 	// validate payload
 	validationResponse, err := helpers.ValidateBody(u.validate, payload)
 	if err != nil {
@@ -139,7 +136,7 @@ func (u *todoUsecase) Create(ctx context.Context, claim model.JWTClaimUser, payl
 	newTodo := model.Todo{
 		ID:     uuid.New().String(),
 		Name:   payload.Name,
-		UserId: claim.UserID,
+		UserID: claim.UserID,
 		Status: model.TodoStatusNotStarted,
 	}
 
@@ -160,7 +157,7 @@ func (u *todoUsecase) Create(ctx context.Context, claim model.JWTClaimUser, payl
 	}
 }
 
-func (u *todoUsecase) Update(ctx context.Context, claim model.JWTClaimUser, todoID string, payload request.UpdateTodoRequest) helpers.Response {
+func (u *todoUsecase) UpdateOne(ctx context.Context, claim model.JWTClaimUser, todoID string, payload request.UpdateTodoRequest) helpers.Response {
 	ctx, cancel := context.WithTimeout(ctx, u.contextTimeout)
 	defer cancel()
 
@@ -195,7 +192,7 @@ func (u *todoUsecase) Update(ctx context.Context, claim model.JWTClaimUser, todo
 	todo.Status = payload.Status
 
 	// save todo
-	err = u.todoRepository.Update(ctx, todo)
+	err = u.todoRepository.UpdateOne(ctx, todo)
 	if err != nil {
 		return helpers.Response{
 			Data:    nil,
@@ -211,7 +208,7 @@ func (u *todoUsecase) Update(ctx context.Context, claim model.JWTClaimUser, todo
 	}
 }
 
-func (u *todoUsecase) Delete(ctx context.Context, claim model.JWTClaimUser, todoID string) helpers.Response {
+func (u *todoUsecase) DeleteOne(ctx context.Context, claim model.JWTClaimUser, todoID string) helpers.Response {
 	ctx, cancel := context.WithTimeout(ctx, u.contextTimeout)
 	defer cancel()
 
@@ -236,7 +233,7 @@ func (u *todoUsecase) Delete(ctx context.Context, claim model.JWTClaimUser, todo
 	}
 
 	// delete todo
-	err = u.todoRepository.Delete(ctx, todo)
+	err = u.todoRepository.DeleteOne(ctx, todo)
 	if err != nil {
 		return helpers.Response{
 			Data:    nil,
