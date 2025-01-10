@@ -93,7 +93,7 @@ func (r *todoHandler) Update(c *gin.Context) {
 		return
 	}
 
-	response := r.TodoUsecase.Update(ctx, claim, todoID, payload)
+	response := r.TodoUsecase.UpdateOne(ctx, claim, todoID, payload)
 
 	c.JSON(response.Status, response)
 }
@@ -104,7 +104,7 @@ func (r *todoHandler) Delete(c *gin.Context) {
 	claim := c.MustGet("user_data").(model.JWTClaimUser)
 	todoID := c.Param("id")
 
-	response := r.TodoUsecase.Delete(ctx, claim, todoID)
+	response := r.TodoUsecase.DeleteOne(ctx, claim, todoID)
 
 	c.JSON(response.Status, response)
 }
