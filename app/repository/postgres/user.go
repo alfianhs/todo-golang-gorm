@@ -21,6 +21,7 @@ type UserRepository interface {
 	FetchList(ctx context.Context, offset, limit int, filters map[string]interface{}) ([]*model.User, error)
 	FindOne(ctx context.Context, filters map[string]interface{}) (*model.User, error)
 	Create(ctx context.Context, user *model.User) error
+	Update(ctx context.Context, user *model.User) error
 }
 
 func (r *userRepository) queryFilter(query *gorm.DB, filters map[string]interface{}) *gorm.DB {
@@ -38,6 +39,7 @@ func (r *userRepository) FetchList(ctx context.Context, offset, limit int, filte
 	var users []*model.User
 
 	err := r.queryFilter(r.db.WithContext(ctx), filters).
+		Preload(string(model.UserRelationFile)).
 		Offset(offset).
 		Limit(limit).
 		Find(&users).Error
@@ -52,7 +54,7 @@ func (r *userRepository) FindOne(ctx context.Context, filters map[string]interfa
 	var user model.User
 	query := r.queryFilter(r.db.WithContext(ctx), filters)
 
-	err := query.First(&user).Error
+	err := query.Preload(string(model.UserRelationFile)).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -68,4 +70,11 @@ func (r *userRepository) Create(ctx context.Context, user *model.User) error {
 		return err
 	}
 	return r.db.WithContext(ctx).Create(user).Error
+}
+
+func (r *userRepository) Update(ctx context.Context, user *model.User) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	return r.db.WithContext(ctx).Save(user).Error
 }

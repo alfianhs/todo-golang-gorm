@@ -6,7 +6,7 @@ import (
 
 type User struct {
 	ID        string     `gorm:"column:id;type:uuid;primary_key" json:"id"`
-	FileID    string     `gorm:"column:file_id;type:uuid;not null" json:"file_id"`
+	AvatarID  *string    `gorm:"column:avatar_id;type:uuid" json:"avatar_id"`
 	Name      string     `gorm:"column:name;type:varchar(255);not null" json:"name"`
 	Email     string     `gorm:"column:email;type:varchar(255);not null;unique" json:"email"`
 	Password  string     `gorm:"column:password;type:varchar(255);not null" json:"-"`
@@ -15,7 +15,7 @@ type User struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at;index" json:"-"`
 
 	Todos  []Todo `gorm:"foreignKey:user_id;references:id" json:"todo,omitempty"`
-	Avatar File   `gorm:"foreignKey:file_id;references:id" json:"avatar,omitempty"`
+	Avatar *File  `gorm:"foreignKey:avatar_id;references:id;constraint:OnDelete:SET NULL" json:"avatar,omitempty"`
 }
 
 func (m *User) TableName() string {

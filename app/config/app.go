@@ -4,6 +4,7 @@ import (
 	"golang-gorm/app/delivery/http/middleware"
 	http_user "golang-gorm/app/delivery/http/user"
 	postgresrepo "golang-gorm/app/repository/postgres"
+	s3repo "golang-gorm/app/repository/s3"
 	"golang-gorm/app/usecase"
 	usecase_user "golang-gorm/app/usecase/user"
 	"time"
@@ -21,9 +22,13 @@ type BootstrapConfig struct {
 }
 
 func Bootstrap(config BootstrapConfig) {
-	// init repository
+	// init postgres repository
 	userRepository := postgresrepo.NewUserRepository(config.DB)
 	todoRepository := postgresrepo.NewTodoRepository(config.DB)
+	fileRepository := postgresrepo.NewFileRepository(config.DB)
+
+	// init s3 repository
+	s3Repository := s3repo.NewS3Repository(config.Timeout)
 
 	// init usecase
 	userAuthUsecase := usecase_user.NewAuthUsecase(usecase.UsecaseDependency{
@@ -36,6 +41,13 @@ func Bootstrap(config BootstrapConfig) {
 		Validate:       config.Validator,
 		Timeout:        config.Timeout,
 	})
+	userSettingUsecase := usecase_user.NewSettingUsecase(usecase.UsecaseDependency{
+		UserRepository: userRepository,
+		FileRepository: fileRepository,
+		S3Repository:   s3Repository,
+		Validate:       config.Validator,
+		Timeout:        config.Timeout,
+	})
 
 	// init auth middleware
 	authMiddleware := middleware.NewAuthMiddleware()
@@ -43,4 +55,5 @@ func Bootstrap(config BootstrapConfig) {
 	// init http delivery
 	http_user.NewAuthHandler(config.GinEngine, authMiddleware, userAuthUsecase)
 	http_user.NewTodoHandler(config.GinEngine, authMiddleware, userTodoUsecase)
+	http_user.NewSettingHandler(config.GinEngine, authMiddleware, userSettingUsecase)
 }
